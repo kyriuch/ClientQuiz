@@ -1,6 +1,5 @@
 package sample;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,35 +8,30 @@ import java.net.Socket;
 public class MySocket extends Socket implements Runnable {
 
     private PrintWriter printWriter;
-    private BufferedReader bufferedReader;
+    private ObjectInputStream objectInputStream;
     private boolean isRunning;
 
     MySocket(String host, int port) throws IOException {
         super(host, port);
     }
 
-    private void proceedIncomingString(String string) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        TcpMessage tcpMessage = objectMapper.readValue(string, TcpMessage.class);
-
-        Logger logger = LoggerFactory.getLogger(MySocket.class);
-        logger.info(String.valueOf((Question) tcpMessage.getOutObject()));
-
-        if(tcpMessage.getOutObject() instanceof Question) {
-            logger.info("TUTAJ JESTEM");
+    private void proceedIncomingTcpMessage(TcpMessage tcpMessage) throws IOException {
+        if(tcpMessage.getOutType().equals(Question.class.getName())) {
+            Question question = (Question) tcpMessage.getOutObject();
+            Main.controller.setCurrentQuestion(question.getContent());
         }
     }
 
     @Override
     public void run() {
         isRunning = true;
+
         Logger logger = LoggerFactory.getLogger(MySocket.class);
         logger.info("Starting socket - " + String.valueOf(this));
 
         try {
             printWriter = new PrintWriter(getOutputStream(), true);
-            bufferedReader = new BufferedReader(new InputStreamReader(getInputStream()));
+            objectInputStream = new ObjectInputStream(getInputStream());
         } catch (IOException e) {
             isRunning = false;
             e.printStackTrace();
@@ -45,12 +39,14 @@ public class MySocket extends Socket implements Runnable {
 
         while(isRunning) {
             try {
-                String line = bufferedReader.readLine();
-                logger.info("Got line - " + line);
+                TcpMessage tcpMessage = (TcpMessage) objectInputStream.readObject();
+                logger.info("Got TcpMessage - " + String.valueOf(tcpMessage));
 
-                proceedIncomingString(line);
+                proceedIncomingTcpMessage(tcpMessage);
             } catch (IOException e) {
                 isRunning = false;
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
 
@@ -58,7 +54,9 @@ public class MySocket extends Socket implements Runnable {
         }
     }
 
-    public void stop() {
+    public void stop() throws IOException {
         isRunning = false;
+        objectInputStream.close();
+        printWriter.close();
     }
 }
