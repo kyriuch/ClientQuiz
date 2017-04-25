@@ -22,7 +22,7 @@ public class MySocket extends Socket implements Runnable {
         TcpMessage tcpMessage = objectMapper.readValue(string, TcpMessage.class);
 
         Logger logger = LoggerFactory.getLogger(MySocket.class);
-        logger.info(String.valueOf(tcpMessage));
+        logger.info(String.valueOf((Question) tcpMessage.getOutObject()));
 
         if(tcpMessage.getOutObject() instanceof Question) {
             logger.info("TUTAJ JESTEM");
