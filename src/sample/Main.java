@@ -15,7 +15,7 @@ public class Main extends Application {
         FXMLLoader loader =  new FXMLLoader(getClass().getResource("sample.fxml"));
         Parent root = loader.load();
         primaryStage.setTitle("Client Quiz");
-        primaryStage.setScene(new Scene(root, 600, 600));
+        primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
         controller = loader.getController();
 

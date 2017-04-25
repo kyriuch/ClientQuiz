@@ -1,5 +1,6 @@
 package sample;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,29 +10,22 @@ public class MySocket extends Socket implements Runnable {
 
     private PrintWriter printWriter;
     private BufferedReader bufferedReader;
-    ObjectInputStream objectInputStream;
     private boolean isRunning;
 
     MySocket(String host, int port) throws IOException {
         super(host, port);
     }
 
-    private void proceedIncomingString(String string) {
-        try {
-            if(string.equals("QUESTION_COMING")) {
-                Logger logger = LoggerFactory.getLogger(MySocket.class);
-                logger.info("Starting reading object");
-                Question question = (Question) objectInputStream.readObject();
-                logger.info("Read object: " + question);
+    private void proceedIncomingString(String string) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
 
-                Main.controller.setCurrentQuestion(question.getContent());
-            } else if(string.equals("WRONG")){
-            } else if(string.equals("CORRECT")) {
-            }
-        } catch(IOException | ClassNotFoundException e) {
+        TcpMessage tcpMessage = objectMapper.readValue(string, TcpMessage.class);
 
-            isRunning = false;
-            e.printStackTrace();
+        Logger logger = LoggerFactory.getLogger(MySocket.class);
+        logger.info(String.valueOf(tcpMessage));
+
+        if(tcpMessage.getOutObject() instanceof Question) {
+            logger.info("TUTAJ JESTEM");
         }
     }
 
@@ -44,13 +38,10 @@ public class MySocket extends Socket implements Runnable {
         try {
             printWriter = new PrintWriter(getOutputStream(), true);
             bufferedReader = new BufferedReader(new InputStreamReader(getInputStream()));
-            objectInputStream = new ObjectInputStream(new BufferedInputStream(getInputStream()));
         } catch (IOException e) {
             isRunning = false;
             e.printStackTrace();
         }
-
-
 
         while(isRunning) {
             try {
