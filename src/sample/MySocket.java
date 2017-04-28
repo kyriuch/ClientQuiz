@@ -57,9 +57,9 @@ public class MySocket extends Socket implements Runnable {
     private void proceedIncomingTcpMessage(final TcpMessage tcpMessage) throws IOException {
         Logger logger = LoggerFactory.getLogger(MySocket.class);
 
-        if (tcpMessage.getOutClass().getSimpleName().equals(Question.class.getSimpleName())) {
+        if (tcpMessage.getOutClass().equals(Question.class)) {
             tcpMessage.setHandler((obj) -> Main.controller.setCurrentQuestion(((Question) obj).getContent()));
-        } else if (tcpMessage.getOutClass().getSimpleName().equals(ChatMessage.class.getSimpleName())) {
+        } else if (tcpMessage.getOutClass().equals(ChatMessage.class)) {
             tcpMessage.setHandler((obj) -> logger.info(obj.toString()));
         }
 
