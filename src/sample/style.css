@@ -1,0 +1,31 @@
+.root {
+    -fx-background-color: #0D47A1;
+}
+
+.label {
+    -fx-text-fill: beige;
+}
+
+.button {
+    -fx-text-fill: beige;
+    -fx-background-color: #0D47A1;
+    -fx-border-color: beige;
+}
+
+.text-field {
+    -fx-text-fill: beige;
+    -fx-background-color: #0D47A1;
+    -fx-prompt-text-fill: beige;
+    -fx-border-color: beige;
+}
+
+.list-cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: #0D47A1;
+}
+
+.list-view {
+    -fx-background-color: #0D47A1;
+    -fx-border-color: beige;
+    -fx-wrap-text: true;
+}

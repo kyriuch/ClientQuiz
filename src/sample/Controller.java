@@ -1,39 +1,58 @@
 package sample;
 
-import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
-public class Controller {
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-    boolean isLogged = false;
-
-    @FXML
-    private Label currentQuestion;
+public class Controller implements Initializable {
+    private boolean isLogged = false;
 
     @FXML
     private TextField loginTextField;
 
-    public void setCurrentQuestion(String s) {
-        Platform.runLater(() -> currentQuestion.setText(s));
-    }
-
     @FXML
-    private void onLoginClicked() {
+    private void onLoginClicked() throws IOException {
         if(!isLogged) {
             if(loginTextField.getText().isEmpty()) {
                 return;
             }
 
+            FXMLLoader loader =  new FXMLLoader(getClass().getResource("home.fxml"));
+            Parent root = loader.load();
+            Main.controller = loader.getController();
+            Scene scene = new Scene(root, 860, 670);
+            scene.getStylesheets().add("sample/style.css");
+            Main.controller.setUserName(Main.userName = loginTextField.getText());
+            Main.stage.setTitle(Main.userName + " - Quizer");
+            Main.stage.setScene(scene);
+
+
             new Thread(new Connector()).start();
-            currentQuestion.setStyle("visibility: visible");
 
             isLogged = true;
         }
     }
 
-    public Controller getController() {
-        return this;
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        loginTextField.setOnKeyPressed(event -> {
+            if(event.getCode() == KeyCode.ENTER) {
+                try {
+                    onLoginClicked();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

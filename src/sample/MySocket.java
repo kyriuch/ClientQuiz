@@ -8,9 +8,17 @@ import java.net.Socket;
 
 public class MySocket extends Socket implements Runnable {
 
-    private ObjectOutputStream objectOutputStream;
+    private static ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
     private boolean isRunning;
+
+    public static void sendChatMessage(ChatMessage chatMessage) throws IOException {
+        objectOutputStream.writeObject(new TcpMessage(chatMessage, ChatMessage.class));
+    }
+
+    public static void sendAnswer(Answer answer) throws IOException {
+        objectOutputStream.writeObject(new TcpMessage(answer, Answer.class));
+    }
 
     MySocket(String host, int port) throws IOException {
         super(host, port);
@@ -60,9 +68,19 @@ public class MySocket extends Socket implements Runnable {
         if (tcpMessage.getOutClass().equals(Question.class)) {
             tcpMessage.setHandler((obj) -> Main.controller.setCurrentQuestion(((Question) obj).getContent()));
         } else if (tcpMessage.getOutClass().equals(ChatMessage.class)) {
-            tcpMessage.setHandler((obj) -> logger.info(obj.toString()));
+            tcpMessage.setHandler((obj) -> {
+                if(((ChatMessage) obj).getType().equalsIgnoreCase("NORMAL")) {
+                    Main.controller.addChatMessage(
+                            (((ChatMessage) obj).getHour() + " " +
+                                    ((ChatMessage) obj).getUser() + ": " + ((ChatMessage) obj).getMessage()));
+                } else if(((ChatMessage) obj).getType().equalsIgnoreCase("SERVER")) {
+                    Main.controller.addChatMessage(
+                            ((ChatMessage) obj).getHour() + " SERVER - "+ ((ChatMessage) obj).getMessage());
+                }
+            });
+
         }
 
-            tcpMessage.executeHandler();
+        tcpMessage.executeHandler();
     }
 }
