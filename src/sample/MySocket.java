@@ -13,13 +13,13 @@ public class MySocket extends Socket implements Runnable {
     private boolean isRunning;
 
     public static void sendChatMessage(ChatMessage chatMessage) throws IOException {
-        objectOutputStream.writeObject(new TcpMessage(Main.userName, chatMessage, ChatMessage.class));
+        objectOutputStream.writeObject(new TcpMessage(chatMessage, ChatMessage.class));
         objectOutputStream.flush();
         objectOutputStream.reset();
     }
 
     public static void sendAnswer(Answer answer) throws IOException {
-        objectOutputStream.writeObject(new TcpMessage(Main.userName, answer, Answer.class));
+        objectOutputStream.writeObject(new TcpMessage(answer, Answer.class));
         objectOutputStream.flush();
         objectOutputStream.reset();
     }
@@ -44,7 +44,7 @@ public class MySocket extends Socket implements Runnable {
         }
 
         try {
-            objectOutputStream.writeObject(new TcpMessage(Main.userName, new User(Main.userName), User.class));
+            objectOutputStream.writeObject(new TcpMessage(new User(Main.userName), User.class));
             objectOutputStream.flush();
             objectOutputStream.reset();
         } catch (IOException e) {
