@@ -13,11 +13,15 @@ public class MySocket extends Socket implements Runnable {
     private boolean isRunning;
 
     public static void sendChatMessage(ChatMessage chatMessage) throws IOException {
-        objectOutputStream.writeObject(new TcpMessage(chatMessage, ChatMessage.class));
+        objectOutputStream.writeObject(new TcpMessage(Main.userName, chatMessage, ChatMessage.class));
+        objectOutputStream.flush();
+        objectOutputStream.reset();
     }
 
     public static void sendAnswer(Answer answer) throws IOException {
-        objectOutputStream.writeObject(new TcpMessage(answer, Answer.class));
+        objectOutputStream.writeObject(new TcpMessage(Main.userName, answer, Answer.class));
+        objectOutputStream.flush();
+        objectOutputStream.reset();
     }
 
     MySocket(String host, int port) throws IOException {
@@ -39,6 +43,14 @@ public class MySocket extends Socket implements Runnable {
             e.printStackTrace();
         }
 
+        try {
+            objectOutputStream.writeObject(new TcpMessage(Main.userName, new User(Main.userName), User.class));
+            objectOutputStream.flush();
+            objectOutputStream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         while (isRunning) {
             try {
                 TcpMessage tcpMessage = (TcpMessage) objectInputStream.readObject();
@@ -48,7 +60,7 @@ public class MySocket extends Socket implements Runnable {
             } catch (IOException e) {
                 isRunning = false;
                 e.printStackTrace();
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
 
@@ -62,20 +74,21 @@ public class MySocket extends Socket implements Runnable {
         objectOutputStream.close();
     }
 
-    private void proceedIncomingTcpMessage(final TcpMessage tcpMessage) throws IOException {
+    private void proceedIncomingTcpMessage(final TcpMessage tcpMessage) throws IOException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         Logger logger = LoggerFactory.getLogger(MySocket.class);
 
         if (tcpMessage.getOutClass().equals(Question.class)) {
             tcpMessage.setHandler((obj) -> Main.controller.setCurrentQuestion(((Question) obj).getContent()));
         } else if (tcpMessage.getOutClass().equals(ChatMessage.class)) {
             tcpMessage.setHandler((obj) -> {
-                if(((ChatMessage) obj).getType().equalsIgnoreCase("NORMAL")) {
+                if (((ChatMessage) obj).getType().equalsIgnoreCase("NORMAL")) {
                     Main.controller.addChatMessage(
                             (((ChatMessage) obj).getHour() + " " +
                                     ((ChatMessage) obj).getUser() + ": " + ((ChatMessage) obj).getMessage()));
-                } else if(((ChatMessage) obj).getType().equalsIgnoreCase("SERVER")) {
+                } else if (((ChatMessage) obj).getType().equalsIgnoreCase("SERVER")) {
                     Main.controller.addChatMessage(
-                            ((ChatMessage) obj).getHour() + " SERVER - "+ ((ChatMessage) obj).getMessage());
+                            ((ChatMessage) obj).getHour() + " SERVER - " + ((ChatMessage) obj).getMessage());
+
                 }
             });
 
