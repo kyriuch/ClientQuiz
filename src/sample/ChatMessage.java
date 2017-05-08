@@ -13,6 +13,8 @@ public class ChatMessage implements Serializable {
     private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("DD.MM.YYYY");
     private static SimpleDateFormat simpleHourFormat = new SimpleDateFormat("HH:mm");
 
+
+
     public ChatMessage(String type, String user, String message) {
         Date date = new Date();
         this.type = type;
@@ -23,7 +25,6 @@ public class ChatMessage implements Serializable {
     }
 
     public ChatMessage() {
-
     }
 
     public String getType() {

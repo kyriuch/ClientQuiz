@@ -85,10 +85,13 @@ public class MySocket extends Socket implements Runnable {
                     Main.controller.addChatMessage(
                             (((ChatMessage) obj).getHour() + " " +
                                     ((ChatMessage) obj).getUser() + ": " + ((ChatMessage) obj).getMessage()));
-                } else if (((ChatMessage) obj).getType().equalsIgnoreCase("SERVER")) {
-                    Main.controller.addChatMessage(
-                            ((ChatMessage) obj).getHour() + " SERVER - " + ((ChatMessage) obj).getMessage());
-
+                } else if (((ChatMessage) obj).getUser().equalsIgnoreCase("SERVER")) {
+                    if (((ChatMessage) obj).getType().equalsIgnoreCase("NEWUSER")) {
+                        Main.controller.addUser((((ChatMessage) obj).getMessage()));
+                    } else {
+                        Main.controller.addChatMessage(
+                                ((ChatMessage) obj).getHour() + " SERVER - " + ((ChatMessage) obj).getMessage());
+                    }
                 }
             });
 
