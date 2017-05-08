@@ -1,15 +1,12 @@
 package sample;
 
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -36,6 +33,9 @@ public class Home implements Initializable {
     ListView<Text> chatListView;
 
     @FXML
+    ListView<Text> usersListView;
+
+    @FXML
     TextField chatTextField;
 
     public void setCurrentQuestion(String currentQuestion) {
@@ -52,6 +52,15 @@ public class Home implements Initializable {
             text.setFill(Color.WHITE);
             text.wrappingWidthProperty().bind(chatListView.widthProperty().subtract(25));
             chatListView.getItems().add(text);
+        });
+    }
+
+    public void addUser(String userName) {
+        Platform.runLater(() -> {
+            Text text = new Text(userName);
+            text.setFill(Color.WHITE);
+            text.wrappingWidthProperty().bind(usersListView.widthProperty().subtract(25));
+            usersListView.getItems().add(text);
         });
     }
 

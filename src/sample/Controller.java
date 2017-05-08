@@ -30,7 +30,7 @@ public class Controller implements Initializable {
             FXMLLoader loader =  new FXMLLoader(getClass().getResource("home.fxml"));
             Parent root = loader.load();
             Main.controller = loader.getController();
-            Scene scene = new Scene(root, 860, 670);
+            Scene scene = new Scene(root, 1217, 670);
             scene.getStylesheets().add("sample/style.css");
             Main.controller.setUserName(Main.userName = loginTextField.getText());
             Main.stage.setTitle(Main.userName + " - Quizer");
